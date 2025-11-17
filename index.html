@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chatbot with Dynamic Prompt Builder</title>
+    <title>Educational AI Chatbot</title>
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -96,24 +96,20 @@
             color: var(--dark-color);
         }
         
-        select, input, textarea {
+        select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 16px;
             transition: border-color 0.3s;
+            background-color: white;
         }
         
-        select:focus, input:focus, textarea:focus {
+        select:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
-        }
-        
-        textarea {
-            min-height: 100px;
-            resize: vertical;
         }
         
         .token-inputs {
@@ -121,10 +117,6 @@
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-top: 10px;
-        }
-        
-        .token-inputs input {
-            margin-bottom: 10px;
         }
         
         .btn {
@@ -199,16 +191,6 @@
             white-space: pre-wrap;
         }
         
-        .input-area {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .input-area textarea {
-            flex: 1;
-            min-height: 60px;
-        }
-        
         .loading {
             display: none;
             text-align: center;
@@ -244,13 +226,33 @@
             border-radius: 6px;
             margin-bottom: 15px;
         }
+        
+        .prompt-preview {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+        
+        .guardrail-notice {
+            background-color: #e8f4fd;
+            border: 1px solid #b6d7f9;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #2c3e50;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>AI Chatbot</h1>
-            <p class="subtitle">Dynamic Prompt Builder with Multiple AI Models</p>
+            <h1>Educational AI Chatbot</h1>
+            <p class="subtitle">Safe, Controlled Learning Environment</p>
         </header>
         
         <div class="chat-container">
@@ -289,72 +291,131 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="system-prompt">System Prompt Template</label>
+                    <label for="system-prompt">System Role</label>
                     <select id="system-prompt">
-                        <option value="tutor">Tutor Template</option>
-                        <option value="custom">Custom System Prompt</option>
+                        <option value="tutor">Friendly Tutor</option>
+                        <option value="teacher">Strict Teacher</option>
+                        <option value="explainer">Concept Explainer</option>
+                        <option value="simplifier">Content Simplifier</option>
                     </select>
-                </div>
-                
-                <div id="system-tutor-template" class="form-group">
-                    <label>System Prompt (Tutor)</label>
-                    <textarea id="system-prompt-text" readonly>Act as a friendly tutor for a {board} {class} {subject} student. Explain concepts in simple language, use real-life examples, and check understanding with questions.</textarea>
-                    
-                    <div class="token-inputs">
-                        <input type="text" id="board" placeholder="Board (e.g., CBSE, IB)">
-                        <input type="text" id="class" placeholder="Class (e.g., 10th, 12th)">
-                        <input type="text" id="subject" placeholder="Subject (e.g., Math, Science)">
-                    </div>
-                </div>
-                
-                <div id="system-custom-template" class="form-group" style="display: none;">
-                    <label for="custom-system-prompt">Custom System Prompt</label>
-                    <textarea id="custom-system-prompt" placeholder="Enter your custom system prompt here..."></textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label for="user-prompt">User Prompt Template</label>
-                    <select id="user-prompt">
-                        <option value="practice-problems">Practice Problems Template</option>
-                        <option value="custom">Custom User Prompt</option>
+                    <label for="board">Educational Board</label>
+                    <select id="board">
+                        <option value="CBSE">CBSE</option>
+                        <option value="ICSE">ICSE</option>
+                        <option value="State Board">State Board</option>
+                        <option value="IB">International Baccalaureate</option>
+                        <option value="Cambridge">Cambridge</option>
                     </select>
                 </div>
                 
-                <div id="user-practice-template" class="form-group">
-                    <label>User Prompt (Practice Problems)</label>
-                    <textarea id="user-prompt-text" readonly>Generate 5 practice problems on '{chapter}' with solutions. (Board: {board}, Class: {class}, Subject: Math, Chapter: {chapter})</textarea>
-                    
-                    <div class="token-inputs">
-                        <input type="text" id="user-board" placeholder="Board (e.g., CBSE, IB)">
-                        <input type="text" id="user-class" placeholder="Class (e.g., 10th, 12th)">
-                        <input type="text" id="user-chapter" placeholder="Chapter (e.g., Algebra, Geometry)">
-                    </div>
+                <div class="form-group">
+                    <label for="class">Class/Grade</label>
+                    <select id="class">
+                        <option value="1st Grade">1st Grade</option>
+                        <option value="2nd Grade">2nd Grade</option>
+                        <option value="3rd Grade">3rd Grade</option>
+                        <option value="4th Grade">4th Grade</option>
+                        <option value="5th Grade">5th Grade</option>
+                        <option value="6th Grade">6th Grade</option>
+                        <option value="7th Grade">7th Grade</option>
+                        <option value="8th Grade">8th Grade</option>
+                        <option value="9th Grade">9th Grade</option>
+                        <option value="10th Grade" selected>10th Grade</option>
+                        <option value="11th Grade">11th Grade</option>
+                        <option value="12th Grade">12th Grade</option>
+                    </select>
                 </div>
                 
-                <div id="user-custom-template" class="form-group" style="display: none;">
-                    <label for="custom-user-prompt">Custom User Prompt</label>
-                    <textarea id="custom-user-prompt" placeholder="Enter your custom user prompt here..."></textarea>
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select id="subject">
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Science">Science</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Biology">Biology</option>
+                        <option value="English">English</option>
+                        <option value="History">History</option>
+                        <option value="Geography">Geography</option>
+                        <option value="Computer Science">Computer Science</option>
+                    </select>
                 </div>
                 
-                <button id="send-btn" class="btn btn-primary btn-full">Send to AI</button>
+                <div class="form-group">
+                    <label for="topic-type">Learning Activity</label>
+                    <select id="topic-type">
+                        <option value="practice-problems">Practice Problems</option>
+                        <option value="explain-concept">Explain Concept</option>
+                        <option value="study-plan">Create Study Plan</option>
+                        <option value="quiz">Generate Quiz</option>
+                        <option value="examples">Real-life Examples</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="chapter">Chapter/Topic</label>
+                    <select id="chapter">
+                        <!-- Math topics -->
+                        <option value="Algebra">Algebra</option>
+                        <option value="Geometry">Geometry</option>
+                        <option value="Trigonometry">Trigonometry</option>
+                        <option value="Calculus">Calculus</option>
+                        <option value="Statistics">Statistics</option>
+                        <option value="Number System">Number System</option>
+                        
+                        <!-- Science topics -->
+                        <option value="Force and Motion">Force and Motion</option>
+                        <option value="Atoms and Molecules">Atoms and Molecules</option>
+                        <option value="Human Body">Human Body</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Chemical Reactions">Chemical Reactions</option>
+                        
+                        <!-- Other subjects -->
+                        <option value="Grammar">Grammar</option>
+                        <option value="World Wars">World Wars</option>
+                        <option value="Climate">Climate</option>
+                        <option value="Programming Basics">Programming Basics</option>
+                    </select>
+                </div>
+                
+                <div class="prompt-preview">
+                    <strong>Preview:</strong>
+                    <div id="system-preview">System: Act as a friendly tutor for a CBSE 10th Grade Mathematics student.</div>
+                    <div id="user-preview">User: Generate 5 practice problems on 'Algebra' with solutions.</div>
+                </div>
+                
+                <div class="guardrail-notice">
+                    <strong>Safety Controls Active:</strong> All inputs are restricted to educational options only.
+                </div>
+                
+                <button id="send-btn" class="btn btn-primary btn-full">Generate Educational Content</button>
             </div>
             
             <div class="chat-area">
                 <div class="messages-container" id="messages-container">
                     <div class="message assistant-message">
-                        <div class="message-header">Assistant</div>
-                        <div class="message-content">Hello! I'm your AI assistant. Configure your prompts and settings on the left, then click "Send to AI" to start a conversation.</div>
+                        <div class="message-header">Educational Assistant</div>
+                        <div class="message-content">Welcome! I'm your educational AI assistant. Configure your learning preferences on the left and click "Generate Educational Content" to get started with personalized learning materials.</div>
                     </div>
                 </div>
                 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <p>Processing your request...</p>
+                    <p>Generating educational content...</p>
                 </div>
                 
-                <div class="input-area">
-                    <textarea id="user-input" placeholder="Type your message here..."></textarea>
-                    <button id="send-chat-btn" class="btn">Send</button>
+                <div class="form-group">
+                    <label for="quick-actions">Quick Actions</label>
+                    <select id="quick-actions">
+                        <option value="">Select a quick action...</option>
+                        <option value="more-examples">Get more examples</option>
+                        <option value="simpler-explanation">Explain in simpler terms</option>
+                        <option value="related-topics">Show related topics</option>
+                        <option value="test-knowledge">Test my knowledge</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -366,164 +427,193 @@
             const modelSelect = document.getElementById('model');
             const reasoningEffortSelect = document.getElementById('reasoning-effort');
             const systemPromptSelect = document.getElementById('system-prompt');
-            const userPromptSelect = document.getElementById('user-prompt');
-            const systemTutorTemplate = document.getElementById('system-tutor-template');
-            const systemCustomTemplate = document.getElementById('system-custom-template');
-            const userPracticeTemplate = document.getElementById('user-practice-template');
-            const userCustomTemplate = document.getElementById('user-custom-template');
+            const boardSelect = document.getElementById('board');
+            const classSelect = document.getElementById('class');
+            const subjectSelect = document.getElementById('subject');
+            const topicTypeSelect = document.getElementById('topic-type');
+            const chapterSelect = document.getElementById('chapter');
             const sendBtn = document.getElementById('send-btn');
-            const sendChatBtn = document.getElementById('send-chat-btn');
-            const userInput = document.getElementById('user-input');
+            const quickActionsSelect = document.getElementById('quick-actions');
             const messagesContainer = document.getElementById('messages-container');
             const loading = document.getElementById('loading');
+            const systemPreview = document.getElementById('system-preview');
+            const userPreview = document.getElementById('user-preview');
+            
+            // System prompt templates
+            const systemTemplates = {
+                'tutor': 'Act as a friendly tutor for a {board} {class} {subject} student. Explain concepts in simple language, use real-life examples, and check understanding with questions.',
+                'teacher': 'Act as a strict but fair teacher for a {board} {class} {subject} student. Provide structured explanations, emphasize fundamentals, and include challenging questions.',
+                'explainer': 'Act as a concept explainer for a {board} {class} {subject} student. Break down complex ideas into simple steps, use analogies, and focus on understanding.',
+                'simplifier': 'Act as a content simplifier for a {board} {class} {subject} student. Make difficult topics accessible, avoid jargon, and use everyday examples.'
+            };
+            
+            // User prompt templates
+            const userTemplates = {
+                'practice-problems': "Generate 5 practice problems on '{chapter}' with step-by-step solutions. Make them appropriate for {class} level studying {subject} under {board} curriculum.",
+                'explain-concept': "Explain the concept of '{chapter}' in simple terms suitable for a {class} student. Use analogies and real-life examples from {subject} context.",
+                'study-plan': "Create a 1-week study plan for learning '{chapter}' in {subject} for a {class} {board} student. Include daily topics and practice activities.",
+                'quiz': "Create a 10-question quiz on '{chapter}' for {class} {subject}. Include multiple choice questions with answers and explanations.",
+                'examples': "Provide 5 real-life examples and applications of '{chapter}' from {subject} that a {class} student can relate to."
+            };
             
             // Event Listeners
-            systemPromptSelect.addEventListener('change', function() {
-                if (this.value === 'tutor') {
-                    systemTutorTemplate.style.display = 'block';
-                    systemCustomTemplate.style.display = 'none';
-                } else {
-                    systemTutorTemplate.style.display = 'none';
-                    systemCustomTemplate.style.display = 'block';
-                }
+            [systemPromptSelect, boardSelect, classSelect, subjectSelect, topicTypeSelect, chapterSelect].forEach(select => {
+                select.addEventListener('change', updatePreview);
             });
             
-            userPromptSelect.addEventListener('change', function() {
-                if (this.value === 'practice-problems') {
-                    userPracticeTemplate.style.display = 'block';
-                    userCustomTemplate.style.display = 'none';
-                } else {
-                    userPracticeTemplate.style.display = 'none';
-                    userCustomTemplate.style.display = 'block';
-                }
-            });
+            sendBtn.addEventListener('click', generateContent);
+            quickActionsSelect.addEventListener('change', handleQuickAction);
             
-            sendBtn.addEventListener('click', sendToAI);
-            sendChatBtn.addEventListener('click', sendChatMessage);
-            
-            // Allow pressing Enter to send chat message
-            userInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendChatMessage();
-                }
-            });
+            // Initialize preview
+            updatePreview();
             
             // Functions
-            function sendToAI() {
+            function updatePreview() {
+                const systemRole = systemPromptSelect.value;
+                const board = boardSelect.value;
+                const cls = classSelect.value;
+                const subject = subjectSelect.value;
+                const topicType = topicTypeSelect.value;
+                const chapter = chapterSelect.value;
+                
+                // Update system preview
+                const systemContent = systemTemplates[systemRole]
+                    .replace('{board}', board)
+                    .replace('{class}', cls)
+                    .replace('{subject}', subject);
+                systemPreview.textContent = `System: ${systemContent}`;
+                
+                // Update user preview
+                const userContent = userTemplates[topicType]
+                    .replace(/{chapter}/g, chapter)
+                    .replace(/{board}/g, board)
+                    .replace(/{class}/g, cls)
+                    .replace(/{subject}/g, subject);
+                userPreview.textContent = `User: ${userContent}`;
+            }
+            
+            async function generateContent() {
                 // Get configuration values
                 const model = modelSelect.value;
                 const reasoningEffort = reasoningEffortSelect.value;
+                const systemRole = systemPromptSelect.value;
+                const board = boardSelect.value;
+                const cls = classSelect.value;
+                const subject = subjectSelect.value;
+                const topicType = topicTypeSelect.value;
+                const chapter = chapterSelect.value;
                 
-                // Get system prompt
-                let systemPrompt;
-                if (systemPromptSelect.value === 'tutor') {
-                    const board = document.getElementById('board').value || '{board}';
-                    const cls = document.getElementById('class').value || '{class}';
-                    const subject = document.getElementById('subject').value || '{subject}';
+                // Build prompts
+                const systemContent = systemTemplates[systemRole]
+                    .replace('{board}', board)
+                    .replace('{class}', cls)
+                    .replace('{subject}', subject);
                     
-                    systemPrompt = document.getElementById('system-prompt-text').value
-                        .replace('{board}', board)
-                        .replace('{class}', cls)
-                        .replace('{subject}', subject);
-                } else {
-                    systemPrompt = document.getElementById('custom-system-prompt').value;
-                }
+                const userContent = userTemplates[topicType]
+                    .replace(/{chapter}/g, chapter)
+                    .replace(/{board}/g, board)
+                    .replace(/{class}/g, cls)
+                    .replace(/{subject}/g, subject);
                 
-                // Get user prompt
-                let userPrompt;
-                if (userPromptSelect.value === 'practice-problems') {
-                    const board = document.getElementById('user-board').value || '{board}';
-                    const cls = document.getElementById('user-class').value || '{class}';
-                    const chapter = document.getElementById('user-chapter').value || '{chapter}';
-                    
-                    userPrompt = document.getElementById('user-prompt-text').value
-                        .replace(/{board}/g, board)
-                        .replace(/{class}/g, cls)
-                        .replace(/{chapter}/g, chapter);
-                } else {
-                    userPrompt = document.getElementById('custom-user-prompt').value;
-                }
-                
-                // Validate inputs
-                if (!systemPrompt.trim() || !userPrompt.trim()) {
-                    alert('Please fill in all required prompts');
-                    return;
-                }
+                // Display user message in chat
+                addMessage('user', userContent);
                 
                 // Show loading
                 loading.style.display = 'block';
                 
-                // Create request payload
-                const payload = {
-                    model: model,
-                    reasoning_effort: reasoningEffort,
-                    messages: [
-                        { role: "system", content: systemPrompt },
-                        { role: "user", content: userPrompt }
-                    ],
-                    temperature: 0.7,
-                    max_tokens: 500,
-                    stream: false
-                };
-                
-                // Display user message in chat
-                addMessage('user', userPrompt);
-                
-                // Simulate API call (in a real implementation, you would use fetch or axios)
-                setTimeout(() => {
+                try {
+                    // Make API call
+                    const response = await fetch('https://text.pollinations.ai/openai', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            model: model,
+                            reasoning_effort: reasoningEffort,
+                            messages: [
+                                { role: "system", content: systemContent },
+                                { role: "user", content: userContent }
+                            ],
+                            temperature: 0.7,
+                            max_tokens: 500,
+                            stream: false
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API request failed with status ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
                     // Hide loading
                     loading.style.display = 'none';
                     
-                    // Simulate response based on the model
-                    const responses = {
-                        'openai': 'Here are 5 practice problems on Algebra with step-by-step solutions:\n\n1. Solve for x: 2x + 5 = 15\n   Solution: x = 5\n\n2. Factor the expression: x² - 4\n   Solution: (x - 2)(x + 2)\n\n3. Simplify: (3x²y)(4xy³)\n   Solution: 12x³y⁴\n\n4. Solve the system: 2x + y = 7, x - y = 2\n   Solution: x = 3, y = 1\n\n5. Find the roots: x² - 5x + 6 = 0\n   Solution: x = 2, x = 3',
-                        'gemini': 'As your friendly math tutor, I\'ve prepared these 5 practice problems on Algebra:\n\n1. Linear Equation: 3x - 7 = 8\n   Solution: x = 5\n\n2. Quadratic Equation: x² + 6x + 9 = 0\n   Solution: x = -3 (double root)\n\n3. Polynomial Multiplication: (2x + 3)(x - 4)\n   Solution: 2x² - 5x - 12\n\n4. System of Equations: x + y = 10, 2x - y = 5\n   Solution: x = 5, y = 5\n\n5. Word Problem: If a number is doubled and increased by 7, the result is 25. Find the number.\n   Solution: The number is 9',
-                        'mistral': 'Algebra Practice Problems:\n\n1. Solve: 5x - 3 = 22\n   Answer: x = 5\n\n2. Expand: (x + 4)(x - 3)\n   Answer: x² + x - 12\n\n3. Simplify: 4x²y³ / 2xy\n   Answer: 2xy²\n\n4. Solve: 2(x - 3) = 4x + 6\n   Answer: x = -6\n\n5. Find slope: Through points (2,3) and (5,11)\n   Answer: Slope = 8/3',
-                        'deepseek': 'Here are 5 algebra problems with detailed explanations:\n\n1. Solve: 7x + 15 = 36\n   Step 1: Subtract 15 from both sides → 7x = 21\n   Step 2: Divide by 7 → x = 3\n\n2. Factor: x² - 9\n   This is difference of squares: (x - 3)(x + 3)\n\n3. Simplify: (5x³)(2x²)\n   Multiply coefficients: 5×2=10, add exponents: 3+2=5 → 10x⁵\n\n4. Solve system: 3x + 2y = 12, x - y = 1\n   From second equation: x = y + 1\n   Substitute: 3(y+1) + 2y = 12 → 5y + 3 = 12 → y = 1.8, x = 2.8\n\n5. Quadratic: x² - 7x + 12 = 0\n   Factor: (x - 3)(x - 4) = 0 → x = 3 or x = 4'
-                    };
-                    
-                    const response = responses[model] || 'Thank you for your query. As an AI assistant, I would normally provide a detailed response here based on your selected model and configuration. In a real implementation, this would connect to the actual AI API.';
-                    
                     // Display assistant response
-                    addMessage('assistant', response);
-                }, 2000);
-            }
-            
-            function sendChatMessage() {
-                const message = userInput.value.trim();
-                
-                if (!message) {
-                    alert('Please enter a message');
-                    return;
-                }
-                
-                // Display user message
-                addMessage('user', message);
-                
-                // Clear input
-                userInput.value = '';
-                
-                // Show loading
-                loading.style.display = 'block';
-                
-                // Simulate API response
-                setTimeout(() => {
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        addMessage('assistant', data.choices[0].message.content);
+                    } else if (data.content) {
+                        addMessage('assistant', data.content);
+                    } else {
+                        addMessage('assistant', 'I received your request but the response format was unexpected. Here is the raw data: ' + JSON.stringify(data));
+                    }
+                } catch (error) {
+                    // Hide loading
                     loading.style.display = 'none';
                     
-                    // Simple response logic based on message content
-                    let response = "I'm an AI assistant. In a real implementation, I would provide a meaningful response to your query.";
+                    // Display error message
+                    addMessage('assistant', `Sorry, I encountered an error: ${error.message}. Please try again.`);
+                    console.error('API Error:', error);
+                }
+            }
+            
+            function handleQuickAction() {
+                const action = quickActionsSelect.value;
+                if (!action) return;
+                
+                // Reset quick actions
+                quickActionsSelect.value = '';
+                
+                // Create follow-up message based on quick action
+                let followUpMessage = '';
+                
+                switch(action) {
+                    case 'more-examples':
+                        followUpMessage = 'Can you provide more examples or variations of these problems?';
+                        break;
+                    case 'simpler-explanation':
+                        followUpMessage = 'Can you explain this in even simpler terms?';
+                        break;
+                    case 'related-topics':
+                        followUpMessage = 'What are some related topics I should study next?';
+                        break;
+                    case 'test-knowledge':
+                        followUpMessage = 'Can you create a quick test to check my understanding?';
+                        break;
+                }
+                
+                if (followUpMessage) {
+                    addMessage('user', followUpMessage);
                     
-                    if (message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi')) {
-                        response = "Hello! How can I assist you today?";
-                    } else if (message.toLowerCase().includes('help')) {
-                        response = "I can help you with various tasks. Try configuring the prompts on the left for specialized assistance, or ask me anything directly!";
-                    } else if (message.toLowerCase().includes('thank')) {
-                        response = "You're welcome! Is there anything else I can help you with?";
-                    }
+                    // Show loading
+                    loading.style.display = 'block';
                     
-                    addMessage('assistant', response);
-                }, 1500);
+                    // In a real implementation, you would make another API call here
+                    // For this example, we'll simulate a response
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        
+                        const responses = {
+                            'more-examples': "Certainly! Here are 3 additional examples with different approaches to help reinforce your understanding...",
+                            'simpler-explanation': "Let me break this down into even simpler terms. Think of it like this...",
+                            'related-topics': "Based on what you're learning, I recommend studying these related topics next...",
+                            'test-knowledge': "Let's test your understanding with these 5 quick questions..."
+                        };
+                        
+                        addMessage('assistant', responses[action]);
+                    }, 1500);
+                }
             }
             
             function addMessage(role, content) {
@@ -532,7 +622,7 @@
                 
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'message-header';
-                headerDiv.textContent = role === 'user' ? 'You' : 'Assistant';
+                headerDiv.textContent = role === 'user' ? 'Student' : 'Educational Assistant';
                 
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'message-content';
