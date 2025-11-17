@@ -175,20 +175,56 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show loading
             loading.style.display = 'block';
             
-            // In a real implementation, you would make another API call here
-            // For this example, we'll simulate a response
-            setTimeout(() => {
+            // Get configuration values for context
+            const model = modelSelect.value;
+            const reasoningEffort = reasoningEffortSelect.value;
+            const systemRole = systemPromptSelect.value;
+            const board = boardSelect.value;
+            const cls = classSelect.value;
+            const subject = subjectSelect.value;
+            
+            // Build system prompt
+            const systemContent = systemTemplates[systemRole]
+                .replace('{board}', board)
+                .replace('{class}', cls)
+                .replace('{subject}', subject);
+            
+            // Make API call
+            fetch('https://text.pollinations.ai/openai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model: model,
+                    reasoning_effort: reasoningEffort,
+                    messages: [
+                        { role: "system", content: systemContent },
+                        { role: "user", content: followUpMessage }
+                    ]
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
                 loading.style.display = 'none';
-                
-                const responses = {
-                    'more-examples': "Certainly! Here are 3 additional examples with different approaches to help reinforce your understanding...",
-                    'simpler-explanation': "Let me break this down into even simpler terms. Think of it like this...",
-                    'related-topics': "Based on what you're learning, I recommend studying these related topics next...",
-                    'test-knowledge': "Let's test your understanding with these 5 quick questions..."
-                };
-                
-                addMessage('assistant', responses[action]);
-            }, 1500);
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    addMessage('assistant', data.choices[0].message.content);
+                } else if (data.content) {
+                    addMessage('assistant', data.content);
+                } else {
+                    addMessage('assistant', 'I received your request but the response format was unexpected. Here is the raw data: ' + JSON.stringify(data));
+                }
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                addMessage('assistant', `Sorry, I encountered an error: ${error.message}. Please try again.`);
+                console.error('API Error:', error);
+            });
         }
     }
     
