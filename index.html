@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Educational AI Chatbot</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
 <body>
@@ -26,6 +29,8 @@
                 </div>
 
                 <button id="send-btn" class="btn btn-primary btn-full">Generate Educational Content</button>
+                <button id="view-documents-btn" class="btn btn-primary btn-full" style="margin-bottom:10px;">View
+                    Documents</button>
 
                 <div class="form-group">
                     <label for="model">AI Model</label>
@@ -135,11 +140,9 @@
 
                 <div class="form-group" id="document-controls">
                     <button id="create-document-btn" class="btn">Create New Document</button>
-                    <select id="document-list" style="margin-left:10px;"></select>
-                    <button id="view-document-btn" class="btn">View</button>
-                    <button id="delete-document-btn" class="btn">Delete</button>
-                    <button id="export-pdf-btn" class="btn">Export PDF</button>
-                    <button id="export-json-btn" class="btn">Export JSON</button>
+                    <div id="document-list-container"
+                        style="max-height:200px; overflow-y:auto; border:1px solid #eee; border-radius:6px; margin-top:10px; background:#fafafa;">
+                    </div>
                 </div>
                 <div id="document-viewer" class="hidden"
                     style="background:#fff; border:1px solid #ccc; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.15); padding:16px; margin:16px 0;"></div>
@@ -212,6 +215,27 @@
         <button id="clear-queue" class="btn" style="margin-right:8px;">Clear</button>
         <button id="send-queue" class="btn btn-primary">Send to AI</button>
     </div>
+
+    <!-- Modal for document viewing and editing -->
+    <div id="document-modal" class="hidden" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:2000; display:flex; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:10px; padding:0; min-width:700px; max-width:95vw; max-height:90vh; overflow:auto; position:relative; display:flex;">
+            <div id="modal-sidebar" style="width:220px; background:#f5f7fa; border-right:1px solid #eee; padding:24px 0; overflow-y:auto; height:100%;">
+                <!-- Filenames will be injected here -->
+            </div>
+            <div style="flex:1; padding:24px; position:relative;">
+                <button id="close-document-modal" type="button" style="position:absolute; top:12px; right:12px; font-size:20px; background:none; border:none; cursor:pointer;">&times;</button>
+                <h3 id="modal-document-title"></h3>
+                <div id="modal-document-entries"></div>
+                <button id="modal-save-btn" class="btn btn-primary" style="margin-top:10px;">Save Changes</button>
+                <button id="modal-delete-btn" class="btn" style="margin-top:10px;">Delete Document</button>
+                <button id="modal-json-btn" class="btn" style="margin-top:10px;">Export JSON</button>
+                <button id="modal-pdf-btn" class="btn" style="margin-top:10px;">Export PDF</button>
+                <div id="modal-pdf-error" class="error hidden" style="margin-top:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add to document button below each AI response will be handled by JS -->
     <script src="main.js"></script>
 </body>
 

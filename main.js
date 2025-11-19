@@ -383,288 +383,138 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Custom context menu for follow-up
-    const contextMenu = document.getElementById('custom-context-menu');
-    const askFollowup = document.getElementById('ask-followup');
-    let selectedText = '';
-
-    // Sentence builder queue
-    let sentenceQueue = [];
-    const addToQueue = document.getElementById('add-to-queue');
-    const sentenceBuilderPanel = document.getElementById('sentence-builder-panel');
-    const queueList = document.getElementById('queue-list');
-    const clearQueueBtn = document.getElementById('clear-queue');
-    const sendQueueBtn = document.getElementById('send-queue');
-
-    // Show context menu on right-click in assistant message if text is selected
-    messagesContainer.addEventListener('contextmenu', function (e) {
-        const selection = window.getSelection();
-        const target = e.target.closest('.assistant-message');
-        if (target && selection && selection.toString().trim().length > 0) {
-            e.preventDefault();
-            selectedText = selection.toString().trim();
-            contextMenu.style.top = e.pageY + 'px';
-            contextMenu.style.left = e.pageX + 'px';
-            contextMenu.style.display = 'block';
-        } else {
-            contextMenu.style.display = 'none';
-        }
-    });
-
-    // Hide context menu on click elsewhere
-    document.addEventListener('click', function (e) {
-        if (!contextMenu.contains(e.target)) {
-            contextMenu.style.display = 'none';
-        }
-    });
-
-    // Ask follow-up question with selected text
-    askFollowup.addEventListener('click', function (e) {
-        if (selectedText) {
-            addMessage('user', selectedText);
-            loading.style.display = 'block';
-            // Get configuration values for context
-            const model = modelSelect.value;
-            const reasoningEffort = reasoningEffortSelect.value;
-            const systemRole = systemPromptSelect.value;
-            const board = boardSelect.value;
-            const cls = classSelect.value;
-            const subject = subjectSelect.value;
-            // Build system prompt
-            const systemContent = systemTemplates[systemRole]
-                .replace('{board}', board)
-                .replace('{class}', cls)
-                .replace('{subject}', subject);
-            if (simulationMode) {
-                simulateApiResponse(selectedText).then(data => {
-                    loading.style.display = 'none';
-                    if (data.choices && data.choices[0] && data.choices[0].message) {
-                        addMessage('assistant', data.choices[0].message.content);
-                    } else if (data.content) {
-                        addMessage('assistant', data.content);
-                    } else {
-                        addMessage('assistant', 'I received your request but the response format was unexpected. Here is the raw data: ' + JSON.stringify(data));
-                    }
-                });
-            } else {
-                // Make API call
-                fetch('https://text.pollinations.ai/openai', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        model: model,
-                        reasoning_effort: reasoningEffort,
-                        messages: [
-                            { role: "system", content: systemContent },
-                            { role: "user", content: selectedText }
-                        ]
-                    })
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`API request failed with status ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        loading.style.display = 'none';
-                        if (data.choices && data.choices[0] && data.choices[0].message) {
-                            addMessage('assistant', data.choices[0].message.content);
-                        } else if (data.content) {
-                            addMessage('assistant', data.content);
-                        } else {
-                            addMessage('assistant', 'I received your request but the response format was unexpected. Here is the raw data: ' + JSON.stringify(data));
-                        }
-                    })
-                    .catch(error => {
-                        loading.style.display = 'none';
-                        addMessage('assistant', `Sorry, I encountered an error: ${error.message}. Please try again.`);
-                        console.error('API Error:', error);
-                    });
-            }
-        }
-        contextMenu.style.display = 'none';
-    });
-
-    // Add selected text to sentence builder queue
-    addToQueue.addEventListener('click', function (e) {
-        if (selectedText) {
-            sentenceQueue.push(selectedText);
-            updateQueuePanel();
-            sentenceBuilderPanel.style.display = 'block';
-        }
-        contextMenu.style.display = 'none';
-    });
-
-    // Update queue panel display
-    function updateQueuePanel() {
-        queueList.innerHTML = '';
-        if (sentenceQueue.length === 0) {
-            queueList.textContent = 'Queue is empty.';
-        } else {
-            queueList.innerHTML = sentenceQueue.map((txt, i) => `<div style='margin-bottom:4px;'>${i + 1}. ${txt}</div>`).join('');
-        }
-    }
-
-    // Clear queue
-    clearQueueBtn.addEventListener('click', function () {
-        sentenceQueue = [];
-        updateQueuePanel();
-        sentenceBuilderPanel.style.display = 'none';
-    });
-
-    // Send queue to AI
-    sendQueueBtn.addEventListener('click', function () {
-        if (sentenceQueue.length > 0) {
-            const fullSentence = sentenceQueue.join(' ');
-            addMessage('user', fullSentence);
-            loading.style.display = 'block';
-            // Get configuration values for context
-            const model = modelSelect.value;
-            const reasoningEffort = reasoningEffortSelect.value;
-            const systemRole = systemPromptSelect.value;
-            const board = boardSelect.value;
-            const cls = classSelect.value;
-            const subject = subjectSelect.value;
-            // Build system prompt
-            const systemContent = systemTemplates[systemRole]
-                .replace('{board}', board)
-                .replace('{class}', cls)
-                .replace('{subject}', subject);
-            if (simulationMode) {
-                simulateApiResponse(fullSentence).then(data => {
-                    loading.style.display = 'none';
-                    if (data.choices && data.choices[0] && data.choices[0].message) {
-                        addMessage('assistant', data.choices[0].message.content);
-                    } else if (data.content) {
-                        addMessage('assistant', data.content);
-                    } else {
-                        addMessage('assistant', 'I received your request but the response format was unexpected. Here is the raw data: ' + JSON.stringify(data));
-                    }
-                });
-            } else {
-                // Make API call
-                fetch('https://text.pollinations.ai/openai', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        model: model,
-                        reasoning_effort: reasoningEffort,
-                        messages: [
-                            { role: "system", content: systemContent },
-                            { role: "user", content: fullSentence }
-                        ]
-                    })
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`API request failed with status ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        loading.style.display = 'none';
-                        if (data.choices && data.choices[0] && data.choices[0].message) {
-                            addMessage('assistant', data.choices[0].message.content);
-                        } else if (data.content) {
-                            addMessage('assistant', data.content);
-                        } else {
-                            addMessage('assistant', 'I received your request but the response format was unexpected. Here is the raw data: ' + JSON.stringify(data));
-                        }
-                    })
-                    .catch(error => {
-                        loading.style.display = 'none';
-                        addMessage('assistant', `Sorry, I encountered an error: ${error.message}. Please try again.`);
-                        console.error('API Error:', error);
-                    });
-            }
-            sentenceQueue = [];
-            updateQueuePanel();
-            sentenceBuilderPanel.style.display = 'none';
-        }
-    });
-
     // Document management
     let documents = JSON.parse(localStorage.getItem('documents') || '{}');
     let currentDocument = null;
     let lastAIResponse = '';
+    let documentOrder = JSON.parse(localStorage.getItem('documentOrder') || '[]');
 
     function updateDocumentList() {
-        const docList = document.getElementById('document-list');
-        docList.innerHTML = '<option value="">Select Document</option>';
+        const container = document.getElementById('document-list-container');
+        container.innerHTML = '';
+        // Sort by most recent (documentOrder)
+        documentOrder = documentOrder.filter(name => documents[name]);
         Object.keys(documents).forEach(name => {
-            docList.innerHTML += `<option value="${name}">${name}</option>`;
+            if (!documentOrder.includes(name)) documentOrder.unshift(name);
+        });
+        localStorage.setItem('documentOrder', JSON.stringify(documentOrder));
+        documentOrder.forEach(name => {
+            const item = document.createElement('div');
+            item.textContent = name;
+            item.className = 'document-list-item';
+            item.style.cursor = 'pointer';
+            item.style.padding = '8px 12px';
+            item.style.borderBottom = '1px solid #eee';
+            item.onclick = function() {
+                currentDocument = name;
+                showDocumentModal(name);
+            };
+            container.appendChild(item);
         });
     }
 
     function saveDocumentsToStorage() {
         localStorage.setItem('documents', JSON.stringify(documents));
+        localStorage.setItem('documentOrder', JSON.stringify(documentOrder));
     }
 
     document.getElementById('create-document-btn').addEventListener('click', function() {
         const name = prompt('Enter new document name:');
         if (name && !documents[name]) {
             documents[name] = [];
+            documentOrder.unshift(name);
             saveDocumentsToStorage();
             updateDocumentList();
-            document.getElementById('document-list').value = name;
             currentDocument = name;
         } else if (documents[name]) {
             alert('Document with this name already exists.');
         }
     });
 
-    document.getElementById('document-list').addEventListener('change', function() {
-        currentDocument = this.value;
+    document.getElementById('view-documents-btn').addEventListener('click', function() {
+        showDocumentModal(currentDocument || documentOrder[0]);
     });
 
-    document.getElementById('save-response-btn').addEventListener('click', function() {
-        if (!currentDocument) {
-            alert('Select or create a document first.');
-            return;
+    function showDocumentModal(name) {
+        console.debug('Opening document modal for:', name);
+        const documentModal = document.getElementById('document-modal');
+        const modalTitle = document.getElementById('modal-document-title');
+        const modalEntries = document.getElementById('modal-document-entries');
+        const modalSidebar = document.getElementById('modal-sidebar');
+        modalSidebar.innerHTML = '';
+        documentOrder.forEach(filename => {
+            const item = document.createElement('div');
+            item.textContent = filename;
+            item.className = 'document-list-item';
+            item.style.cursor = 'pointer';
+            item.style.padding = '10px 18px';
+            item.style.borderBottom = '1px solid #eee';
+            if (filename === name) {
+                item.style.background = '#e9ecef';
+                item.style.fontWeight = 'bold';
+            }
+            item.onclick = function() {
+                currentDocument = filename;
+                showDocumentModal(filename);
+            };
+            modalSidebar.appendChild(item);
+        });
+        modalTitle.textContent = name || '';
+        modalEntries.innerHTML = '';
+        if (name && documents[name]) {
+            documents[name].forEach((entry, i) => {
+                const entryDiv = document.createElement('div');
+                entryDiv.style.marginBottom = '12px';
+                entryDiv.innerHTML = `<strong>Entry ${i+1}:</strong>`;
+                const editor = document.createElement('div');
+                editor.contentEditable = true;
+                editor.className = 'wysiwyg-editor';
+                editor.style.border = '1px solid #ccc';
+                editor.style.padding = '8px';
+                editor.style.borderRadius = '6px';
+                editor.style.background = '#f9f9f9';
+                editor.innerHTML = entry;
+                entryDiv.appendChild(editor);
+                modalEntries.appendChild(entryDiv);
+            });
         }
-        if (!lastAIResponse) {
-            alert('No AI response to save.');
-            return;
-        }
-        documents[currentDocument].push(lastAIResponse);
+        documentModal.classList.remove('hidden');
+    }
+
+    const closeModalBtn = document.getElementById('close-document-modal');
+    if (closeModalBtn) {
+        closeModalBtn.onclick = function() {
+            console.debug('Closing document modal');
+            document.getElementById('document-modal').classList.add('hidden');
+        };
+    }
+
+    document.getElementById('modal-save-btn').addEventListener('click', function() {
+        if (!currentDocument) return;
+        console.debug('Saving document:', currentDocument);
+        const modalEntries = document.getElementById('modal-document-entries');
+        const editors = modalEntries.querySelectorAll('.wysiwyg-editor');
+        documents[currentDocument] = Array.from(editors).map(ed => ed.innerHTML);
         saveDocumentsToStorage();
-        alert('Response saved to document.');
+        alert('Document saved.');
     });
 
-    document.getElementById('view-document-btn').addEventListener('click', function() {
-        if (!currentDocument) {
-            alert('Select a document to view.');
-            return;
-        }
-        const viewer = document.getElementById('document-viewer');
-        viewer.innerHTML = `<h3>Document: ${currentDocument}</h3>` + documents[currentDocument].map((entry, i) => `<div style='margin-bottom:12px;'><strong>Entry ${i+1}:</strong><div>${entry}</div></div>`).join('');
-        viewer.classList.remove('hidden');
-    });
-
-    document.getElementById('delete-document-btn').addEventListener('click', function() {
-        if (!currentDocument) {
-            alert('Select a document to delete.');
-            return;
-        }
+    document.getElementById('modal-delete-btn').addEventListener('click', function() {
+        if (!currentDocument) return;
+        console.debug('Deleting document:', currentDocument);
         if (confirm('Are you sure you want to delete this document?')) {
             delete documents[currentDocument];
+            documentOrder = documentOrder.filter(n => n !== currentDocument);
             saveDocumentsToStorage();
             updateDocumentList();
-            document.getElementById('document-viewer').classList.add('hidden');
+            document.getElementById('document-modal').classList.add('hidden');
             currentDocument = null;
         }
     });
 
-    document.getElementById('export-json-btn').addEventListener('click', function() {
-        if (!currentDocument) {
-            alert('Select a document to export.');
-            return;
-        }
+    document.getElementById('modal-json-btn').addEventListener('click', function() {
+        if (!currentDocument) return;
+        console.debug('Exporting document as JSON:', currentDocument);
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(documents[currentDocument], null, 2));
         const dlAnchor = document.createElement('a');
         dlAnchor.setAttribute("href", dataStr);
@@ -672,20 +522,28 @@ document.addEventListener('DOMContentLoaded', function () {
         dlAnchor.click();
     });
 
-    document.getElementById('export-pdf-btn').addEventListener('click', function() {
-        if (!currentDocument) {
-            alert('Select a document to export.');
+    document.getElementById('modal-pdf-btn').addEventListener('click', function() {
+        const pdfError = document.getElementById('modal-pdf-error');
+        pdfError.classList.add('hidden');
+        if (!currentDocument) return;
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            pdfError.textContent = 'jsPDF library not loaded.';
+            pdfError.classList.remove('hidden');
             return;
         }
-        const docContent = documents[currentDocument].map((entry, i) => `Entry ${i+1}:\n${entry}\n\n`).join('');
-        const win = window.open('', '_blank');
-        win.document.write(`<pre>${docContent}</pre>`);
-        win.print();
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let y = 10;
+        documents[currentDocument].forEach((entry, i) => {
+            doc.text(`Entry ${i+1}:`, 10, y);
+            y += 8;
+            doc.text(entry.replace(/<[^>]+>/g, ''), 10, y);
+            y += 16;
+        });
+        doc.save(currentDocument + '.pdf');
     });
 
-    updateDocumentList();
-
-    // Save last AI response after each assistant message
+    // Add to document button below each AI response
     function addMessage(role, content) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${role}-message`;
@@ -708,6 +566,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (role === 'assistant') {
             lastAIResponse = content;
+            let addBtn = document.createElement('button');
+            let removeBtn = document.createElement('button');
+            if (currentDocument && documents[currentDocument] && documents[currentDocument].includes(content)) {
+                removeBtn.textContent = `Remove from ${currentDocument}`;
+                removeBtn.className = 'btn';
+                removeBtn.style.marginTop = '8px';
+                removeBtn.onclick = function() {
+                    documents[currentDocument] = documents[currentDocument].filter(e => e !== content);
+                    saveDocumentsToStorage();
+                    alert('Response removed from document.');
+                };
+                messageDiv.appendChild(removeBtn);
+            } else if (currentDocument) {
+                addBtn.textContent = `Add to ${currentDocument}`;
+                addBtn.className = 'btn';
+                addBtn.style.marginTop = '8px';
+                addBtn.onclick = function() {
+                    documents[currentDocument].push(content);
+                    saveDocumentsToStorage();
+                    alert('Response saved to document.');
+                };
+                messageDiv.appendChild(addBtn);
+            } else {
+                addBtn.textContent = 'Add to new file';
+                addBtn.className = 'btn';
+                addBtn.style.marginTop = '8px';
+                addBtn.onclick = function() {
+                    const name = prompt('No document selected. Enter new document name:');
+                    if (name && !documents[name]) {
+                        documents[name] = [content];
+                        documentOrder.unshift(name);
+                        saveDocumentsToStorage();
+                        updateDocumentList();
+                        currentDocument = name;
+                        alert('Response saved to new document.');
+                    } else if (documents[name]) {
+                        alert('Document with this name already exists.');
+                        return;
+                    } else {
+                        return;
+                    }
+                };
+                messageDiv.appendChild(addBtn);
+            }
         }
     }
 
