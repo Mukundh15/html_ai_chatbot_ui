@@ -228,6 +228,88 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Custom context menu for follow-up
+    const contextMenu = document.getElementById('custom-context-menu');
+    const askFollowup = document.getElementById('ask-followup');
+    let selectedText = '';
+
+    // Show context menu on right-click in assistant message if text is selected
+    messagesContainer.addEventListener('contextmenu', function(e) {
+        const selection = window.getSelection();
+        const target = e.target.closest('.assistant-message');
+        if (target && selection && selection.toString().trim().length > 0) {
+            e.preventDefault();
+            selectedText = selection.toString().trim();
+            contextMenu.style.top = e.pageY + 'px';
+            contextMenu.style.left = e.pageX + 'px';
+            contextMenu.style.display = 'block';
+        } else {
+            contextMenu.style.display = 'none';
+        }
+    });
+
+    // Hide context menu on click elsewhere
+    document.addEventListener('click', function() {
+        contextMenu.style.display = 'none';
+    });
+
+    // Ask follow-up question with selected text
+    askFollowup.addEventListener('click', function(e) {
+        if (selectedText) {
+            addMessage('user', selectedText);
+            loading.style.display = 'block';
+            // Get configuration values for context
+            const model = modelSelect.value;
+            const reasoningEffort = reasoningEffortSelect.value;
+            const systemRole = systemPromptSelect.value;
+            const board = boardSelect.value;
+            const cls = classSelect.value;
+            const subject = subjectSelect.value;
+            // Build system prompt
+            const systemContent = systemTemplates[systemRole]
+                .replace('{board}', board)
+                .replace('{class}', cls)
+                .replace('{subject}', subject);
+            // Make API call
+            fetch('https://text.pollinations.ai/openai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model: model,
+                    reasoning_effort: reasoningEffort,
+                    messages: [
+                        { role: "system", content: systemContent },
+                        { role: "user", content: selectedText }
+                    ]
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                loading.style.display = 'none';
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    addMessage('assistant', data.choices[0].message.content);
+                } else if (data.content) {
+                    addMessage('assistant', data.content);
+                } else {
+                    addMessage('assistant', 'I received your request but the response format was unexpected. Here is the raw data: ' + JSON.stringify(data));
+                }
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                addMessage('assistant', `Sorry, I encountered an error: ${error.message}. Please try again.`);
+                console.error('API Error:', error);
+            });
+        }
+        contextMenu.style.display = 'none';
+    });
+    
     function addMessage(role, content) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${role}-message`;
