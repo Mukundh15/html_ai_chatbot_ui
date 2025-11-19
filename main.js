@@ -233,6 +233,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const askFollowup = document.getElementById('ask-followup');
     let selectedText = '';
 
+    // Sentence builder queue
+    let sentenceQueue = [];
+    const addToQueue = document.getElementById('add-to-queue');
+    const sentenceBuilderPanel = document.getElementById('sentence-builder-panel');
+    const queueList = document.getElementById('queue-list');
+    const clearQueueBtn = document.getElementById('clear-queue');
+    const sendQueueBtn = document.getElementById('send-queue');
+
     // Show context menu on right-click in assistant message if text is selected
     messagesContainer.addEventListener('contextmenu', function(e) {
         const selection = window.getSelection();
@@ -249,8 +257,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Hide context menu on click elsewhere
-    document.addEventListener('click', function() {
-        contextMenu.style.display = 'none';
+    document.addEventListener('click', function(e) {
+        if (!contextMenu.contains(e.target)) {
+            contextMenu.style.display = 'none';
+        }
     });
 
     // Ask follow-up question with selected text
@@ -308,6 +318,93 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         contextMenu.style.display = 'none';
+    });
+
+    // Add selected text to sentence builder queue
+    addToQueue.addEventListener('click', function(e) {
+        if (selectedText) {
+            sentenceQueue.push(selectedText);
+            updateQueuePanel();
+            sentenceBuilderPanel.style.display = 'block';
+        }
+        contextMenu.style.display = 'none';
+    });
+
+    // Update queue panel display
+    function updateQueuePanel() {
+        queueList.innerHTML = '';
+        if (sentenceQueue.length === 0) {
+            queueList.textContent = 'Queue is empty.';
+        } else {
+            queueList.innerHTML = sentenceQueue.map((txt, i) => `<div style='margin-bottom:4px;'>${i+1}. ${txt}</div>`).join('');
+        }
+    }
+
+    // Clear queue
+    clearQueueBtn.addEventListener('click', function() {
+        sentenceQueue = [];
+        updateQueuePanel();
+        sentenceBuilderPanel.style.display = 'none';
+    });
+
+    // Send queue to AI
+    sendQueueBtn.addEventListener('click', function() {
+        if (sentenceQueue.length > 0) {
+            const fullSentence = sentenceQueue.join(' ');
+            addMessage('user', fullSentence);
+            loading.style.display = 'block';
+            // Get configuration values for context
+            const model = modelSelect.value;
+            const reasoningEffort = reasoningEffortSelect.value;
+            const systemRole = systemPromptSelect.value;
+            const board = boardSelect.value;
+            const cls = classSelect.value;
+            const subject = subjectSelect.value;
+            // Build system prompt
+            const systemContent = systemTemplates[systemRole]
+                .replace('{board}', board)
+                .replace('{class}', cls)
+                .replace('{subject}', subject);
+            // Make API call
+            fetch('https://text.pollinations.ai/openai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model: model,
+                    reasoning_effort: reasoningEffort,
+                    messages: [
+                        { role: "system", content: systemContent },
+                        { role: "user", content: fullSentence }
+                    ]
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                loading.style.display = 'none';
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    addMessage('assistant', data.choices[0].message.content);
+                } else if (data.content) {
+                    addMessage('assistant', data.content);
+                } else {
+                    addMessage('assistant', 'I received your request but the response format was unexpected. Here is the raw data: ' + JSON.stringify(data));
+                }
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                addMessage('assistant', `Sorry, I encountered an error: ${error.message}. Please try again.`);
+                console.error('API Error:', error);
+            });
+            sentenceQueue = [];
+            updateQueuePanel();
+            sentenceBuilderPanel.style.display = 'none';
+        }
     });
     
     function addMessage(role, content) {

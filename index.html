@@ -181,6 +181,13 @@
     </div>
     <div id="custom-context-menu" style="display:none; position:absolute; z-index:1000; background:#fff; border:1px solid #ccc; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
         <div id="ask-followup" style="padding:10px 20px; cursor:pointer;">Ask follow-up question with selected text</div>
+        <div id="add-to-queue" style="padding:10px 20px; cursor:pointer;">Add to Sentence Builder</div>
+    </div>
+    <div id="sentence-builder-panel" style="display:none; position:fixed; bottom:30px; right:30px; background:#fff; border:1px solid #ccc; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.15); padding:16px; min-width:300px; z-index:1001;">
+        <div style="font-weight:600; margin-bottom:8px;">Sentence Builder</div>
+        <div id="queue-list" style="margin-bottom:12px; color:#333;"></div>
+        <button id="clear-queue" class="btn" style="margin-right:8px;">Clear</button>
+        <button id="send-queue" class="btn btn-primary">Send to AI</button>
     </div>
     <script src="main.js"></script>
 </body>
