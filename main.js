@@ -293,6 +293,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Disable send button if required fields not selected
+    function updateSendBtnState() {
+        if (sendBtn) {
+            sendBtn.disabled = !(classSelect && classSelect.value && subjectSelect && subjectSelect.value && getSelectedChapters().length);
+        }
+    }
+    if (classSelect) classSelect.addEventListener('change', updateSendBtnState);
+    if (subjectSelect) subjectSelect.addEventListener('change', updateSendBtnState);
+
     async function generateContent() {
         // Get configuration values
         const model = modelSelect.value;
@@ -566,6 +575,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function saveDocumentsToStorage() {
         localStorage.setItem('documents', JSON.stringify(documents));
         localStorage.setItem('documentOrder', JSON.stringify(documentOrder));
+        updateViewDocumentsBtn();
+    }
+
+    function updateViewDocumentsBtn() {
+        const btn = document.getElementById('view-documents-btn');
+        btn.style.display = Object.keys(documents).length > 0 ? '' : 'none';
     }
 
     document.getElementById('create-document-btn').addEventListener('click', function () {
@@ -1294,6 +1309,20 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    // Multi-select logic
+    function getSelectedChapters() {
+        return Array.from(document.querySelectorAll('#chapter-checkboxes input:checked')).map(cb => cb.value);
+    }
+    function getSelectedTopics() {
+        return Array.from(document.querySelectorAll('#topic-checkboxes input:checked')).map(cb => cb.value);
+    }
+    function getSelectedSubtopics() {
+        return Array.from(document.querySelectorAll('#subtopic-checkboxes input:checked')).map(cb => cb.value);
+    }
+
+    // After document changes, update button
+    updateViewDocumentsBtn();
 
     // Initialize preview
     updatePreview();

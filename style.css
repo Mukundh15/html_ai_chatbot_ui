@@ -147,6 +147,13 @@ select:focus {
     width: 100%;
 }
 
+.btn:disabled, .btn[disabled], .btn.btn-primary:disabled {
+    background-color: #bbb !important;
+    color: #eee !important;
+    cursor: not-allowed !important;
+    opacity: 0.7;
+}
+
 .messages-container {
     flex: 1;
     overflow-y: auto;
