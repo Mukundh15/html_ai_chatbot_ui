@@ -1,9 +1,30 @@
 # Educational AI Chatbot UI
 
+## Prepopulate Toolbar from URL
+
+You can prepopulate board, class, subject, chapters, topics, and subtopics using URL parameters:
+
+```
+?board=CBSE&class=Class9&subject=Mathematics&chapters=Polynomials&topics=Definition&subtopics=Binomials
+```
+
+Example:
+```
+http://127.0.0.1:5500/?board=CBSE&class=Class9&subject=Mathematics&chapters=Polynomials&topics=Definition&subtopics=Binomials
+```
+
+- `board`, `class`, `subject` are single values.
+- `chapters`, `topics`, `subtopics` are comma-separated lists for multi-select.
+
 ## Overview
 This project is a web-based educational AI chatbot UI designed for safe, controlled learning. It allows students to generate personalized educational content, practice problems, explanations, quizzes, and more, tailored to their curriculum and grade.
 
 ## Features
+- Safe, controlled educational content generation
+- Document management and export
+- Markdown editing and preview
+- Multi-select for chapters, topics, subtopics
+- Toolbar for quick configuration
 - Select class, subject, chapter, topic, and subtopic from a hierarchical curriculum (topics-hierarchy.json)
 - Choose AI model, reasoning effort, and system role
 - Generate educational content via AI

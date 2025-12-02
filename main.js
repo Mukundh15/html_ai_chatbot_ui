@@ -1367,9 +1367,29 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Restore last selections from localStorage
-    const lastSelections = JSON.parse(localStorage.getItem('lastSelections') || '{}');
-    console.debug('Restoring last selections:', lastSelections);
+    // Check if URL has prepopulation parameters
+    function hasPrepopulateParams() {
+        const params = new URLSearchParams(window.location.search);
+        return params.has('board') || params.has('class') || params.has('subject') || params.has('chapters') || params.has('topics') || params.has('subtopics');
+    }
+
+    // Restore last selections from localStorage or URL params
+    let lastSelections = {};
+    if (hasPrepopulateParams()) {
+        const params = new URLSearchParams(window.location.search);
+        lastSelections = {
+            board: params.get('board') || '',
+            class: params.get('class') || '',
+            subject: params.get('subject') || '',
+            chapter: params.get('chapters') || '',
+            topic: params.get('topics') || '',
+            subtopic: params.get('subtopics') || ''
+        };
+        console.debug('Restoring last selections from URL params:', lastSelections);
+    } else {
+        lastSelections = JSON.parse(localStorage.getItem('lastSelections') || '{}');
+        console.debug('Restoring last selections from localStorage:', lastSelections);
+    }
 
     function setDropdownValue(select, value, isMultiple = false) {
         if (!select || !value) return;
@@ -1719,6 +1739,43 @@ document.addEventListener('DOMContentLoaded', function () {
         console.debug('getSelectedSubtopics:', values);
         return values.join(',');
     }
+
+    // Prepopulate toolbar from URL params
+    function prepopulateFromURL() {
+        console.log('Prepopulating from URL parameters');
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('board') && boardSelect) {
+            setDropdownValue(boardSelect, params.get('board'));
+            console.debug('Prepopulating board:', params.get('board'));
+        }
+        if (params.has('class') && classSelect) {
+            setDropdownValue(classSelect, params.get('class'));
+            console.debug('Prepopulating class:', params.get('class'));
+        }
+        if (params.has('subject') && subjectSelect) {
+            setDropdownValue(subjectSelect, params.get('subject'));
+            console.debug('Prepopulating subject:', params.get('subject'));
+        }
+        if (params.has('chapters')) {
+            setDropdownValue(chapterSelect, params.get('chapters'), true);
+            console.debug('Prepopulating chapters:', params.get('chapters'));
+        }
+        if (params.has('topics')) {
+            setDropdownValue(topicSelect, params.get('topics'), true);
+            console.debug('Prepopulating topics:', params.get('topics'));
+        }
+        if (params.has('subtopics')) {
+            setDropdownValue(subtopicSelect, params.get('subtopics'), true);
+            console.debug('Prepopulating subtopics:', params.get('subtopics'));
+        }
+        updateSendBtnState();
+    }
+    // Call after dropdowns and checkboxes are populated
+    //window.prepopulateFromURL = prepopulateFromURL;
+    prepopulateFromURL();
+
+    // After populating dropdowns and checkboxes, call prepopulateFromURL()
+    // For example, after populateClassDropdown, populateCheckboxes, etc.
 
     // After document changes, update button
     updateViewDocumentsBtn();
