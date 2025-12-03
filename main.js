@@ -221,21 +221,30 @@ document.addEventListener('DOMContentLoaded', function () {
 - Bullet points for misconception signs`
     };
 
+    // Debug logging control
+    const debugMode = new URLSearchParams(window.location.search).get('debug') === 'true';
+    function debugLog(...args) {
+        if (debugMode) console.log(...args);
+    }
+    function debugLogObj(obj) {
+        if (debugMode) console.debug(obj);
+    }
+
     // Debug: Log DOM elements
-    console.debug('modelSelect:', modelSelect);
-    console.debug('reasoningEffortSelect:', reasoningEffortSelect);
-    console.debug('systemPromptSelect:', systemPromptSelect);
-    console.debug('boardSelect:', boardSelect);
-    console.debug('classSelect:', classSelect);
-    console.debug('subjectSelect:', subjectSelect);
-    console.debug('topicTypeSelect:', topicTypeSelect);
-    console.debug('chapterSelect:', chapterSelect);
-    console.debug('sendBtn:', sendBtn);
-    console.debug('quickActionsSelect:', quickActionsSelect);
-    console.debug('messagesContainer:', messagesContainer);
-    console.debug('loading:', loading);
-    console.debug('systemPreview:', systemPreview);
-    console.debug('userPreview:', userPreview);
+    debugLog('modelSelect:', modelSelect);
+    debugLog('reasoningEffortSelect:', reasoningEffortSelect);
+    debugLog('systemPromptSelect:', systemPromptSelect);
+    debugLog('boardSelect:', boardSelect);
+    debugLog('classSelect:', classSelect);
+    debugLog('subjectSelect:', subjectSelect);
+    debugLog('topicTypeSelect:', topicTypeSelect);
+    debugLog('chapterSelect:', chapterSelect);
+    debugLog('sendBtn:', sendBtn);
+    debugLog('quickActionsSelect:', quickActionsSelect);
+    debugLog('messagesContainer:', messagesContainer);
+    debugLog('loading:', loading);
+    debugLog('systemPreview:', systemPreview);
+    debugLog('userPreview:', userPreview);
 
     // Event Listeners (with null checks)
     [systemPromptSelect, boardSelect, classSelect, subjectSelect, topicTypeSelect, chapterSelect].forEach((select, idx) => {
@@ -267,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const chapter = getSelectedChapters();
         const topic = getSelectedTopics();
         const subtopic = getSelectedSubtopics();
-        console.debug('Updating preview with:', {
+        debugLog('Updating preview with:', {
             systemRole,
             board,
             cls,
@@ -319,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Disable send button if required fields not selected
     function updateSendBtnState() {
+        return true;
         if (sendBtn) {
             sendBtn.disabled = !(classSelect && classSelect.value && subjectSelect && subjectSelect.value && getSelectedChapters().length);
         }
@@ -338,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const chapter = getSelectedChapters();
         const topic = getSelectedTopics();
         const subtopic = getSelectedSubtopics();
-        console.debug('Generating content with:', {
+        debugLog('Generating content with:', {
             model,
             reasoningEffort,
             systemRole,
@@ -829,7 +839,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function showDocumentModal(name) {
-        console.debug('Opening document modal for:', name);
+        debugLog('Opening document modal for:', name);
         currentDocument = name; // Ensure currentDocument is set to the displayed document
         const documentModal = document.getElementById('document-modal');
         const modalTitle = document.getElementById('modal-document-title');
@@ -966,14 +976,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeModalBtn = document.getElementById('close-document-modal');
     if (closeModalBtn) {
         closeModalBtn.onclick = function () {
-            console.debug('Closing document modal');
+            debugLog('Closing document modal');
             document.getElementById('document-modal').classList.add('hidden');
         };
     }
 
     document.getElementById('modal-save-btn').addEventListener('click', function () {
         if (!currentDocument) return;
-        console.debug('Saving document:', currentDocument);
+        debugLog('Saving document:', currentDocument);
         const modalEntries = document.getElementById('modal-document-entries');
         const editors = modalEntries.querySelectorAll('.markdown-editor');
         documents[currentDocument] = Array.from(editors).map(ed => ed.value);
@@ -983,7 +993,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('modal-delete-btn').addEventListener('click', function () {
         if (!currentDocument) return;
-        console.debug('Deleting document:', currentDocument);
+        debugLog('Deleting document:', currentDocument);
         if (confirm('Are you sure you want to delete this document?')) {
             delete documents[currentDocument];
             documentOrder = documentOrder.filter(n => n !== currentDocument);
@@ -996,7 +1006,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('modal-json-btn').addEventListener('click', function () {
         if (!currentDocument) return;
-        console.debug('Exporting document as JSON:', currentDocument);
+        debugLog('Exporting document as JSON:', currentDocument);
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(documents[currentDocument], null, 2));
         const dlAnchor = document.createElement('a');
         dlAnchor.setAttribute("href", dataStr);
@@ -1169,10 +1179,10 @@ document.addEventListener('DOMContentLoaded', function () {
             topic: params.get('topics') || '',
             subtopic: params.get('subtopics') || ''
         };
-        console.debug('Restoring last selections from URL params:', lastSelections);
+        debugLog('Restoring last selections from URL params:', lastSelections);
     } else {
         lastSelections = JSON.parse(localStorage.getItem('lastSelections') || '{}');
-        console.debug('Restoring last selections from localStorage:', lastSelections);
+        debugLog('Restoring last selections from localStorage:', lastSelections);
     }
 
     function setDropdownValue(select, value, isMultiple = false) {
@@ -1202,7 +1212,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function saveSelections() {
-        console.debug('Saving selections to localStorage');
+        debugLog('Saving selections to localStorage');
         localStorage.setItem('lastSelections', JSON.stringify({
             class: classSelect.value,
             subject: subjectSelect.value,
@@ -1210,7 +1220,7 @@ document.addEventListener('DOMContentLoaded', function () {
             topic: getSelectedTopics(),
             subtopic: getSelectedSubtopics()
         }));
-        console.debug('Selections saved:', {
+        debugLog('Selections saved:', {
             class: classSelect.value,
             subject: subjectSelect.value,
             chapter: getSelectedChapters(),
@@ -1284,9 +1294,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
 
+                // Clear existing options first
+                topicSelect.innerHTML = '';
                 uniqueTopics.forEach(topic => {
                     topicSelect.innerHTML += `<option value="${topic}">${topic}</option>`;
                 });
+                console.log('Restored Topics:', Array.from(uniqueTopics));
 
                 // Handle multiple topics
                 if (lastSelections.topic) {
@@ -1325,6 +1338,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
 
+                // Clear existing options first
+                subtopicSelect.innerHTML = '';
                 uniqueSubtopics.forEach(subtopic => {
                     subtopicSelect.innerHTML += `<option value="${subtopic}">${subtopic}</option>`;
                 });
@@ -1332,9 +1347,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Handle multiple subtopics
                 if (lastSelections.subtopic) {
                     const selectedSubtopics = lastSelections.subtopic.split(',');
-                    console.debug('restore Selected subtopics:', selectedSubtopics);
+                    debugLog('restore Selected subtopics:', selectedSubtopics);
                     selectedSubtopics.forEach(subtopic => {
-                        console.debug('restore Selected subtopic:', subtopic);
+                        debugLog('restore Selected subtopic:', subtopic);
                         setDropdownValue(subtopicSelect, subtopic, true); // true for multiple selection
                     });
                 }
@@ -1349,6 +1364,9 @@ document.addEventListener('DOMContentLoaded', function () {
             classSelect.innerHTML += `<option value="${cls}">${cls.replace('Class', '')} Grade</option>`;
         });
         subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+        topicSelect.innerHTML = '';
+        subtopicSelect.innerHTML = '';
+        chapterSelect.innerHTML = '';
         // chapterSelect.innerHTML = '<option value="">Select Chapter/Topic</option>';
         // topicSelect.innerHTML = '<option value="">Select Topic</option>';
         // subtopicSelect.innerHTML = '<option value="">Select Subtopic</option>';
@@ -1368,7 +1386,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (select.multiple) {
                         // For multi-select, deselect all options
                         Array.from(select.options).forEach(option => {
-                            console.debug('Deselecting option:', option.value);
+                            debugLog('Deselecting option:', option.value);
                             option.selected = false;
                         });
                     } else {
@@ -1382,6 +1400,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     classSelect.addEventListener('change', function () {
         subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+        topicSelect.innerHTML = '';
+        subtopicSelect.innerHTML = '';
+        chapterSelect.innerHTML = '';
         // chapterSelect.innerHTML = '<option value="">Select Chapter/Topic</option>';
         // topicSelect.innerHTML = '<option value="">Select Topic</option>';
         // subtopicSelect.innerHTML = '<option value="">Select Subtopic</option>';
@@ -1398,6 +1419,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     subjectSelect.addEventListener('change', function () {
+        topicSelect.innerHTML = '';
+        subtopicSelect.innerHTML = '';
+        chapterSelect.innerHTML = '';
         // chapterSelect.innerHTML = '<option value="">Select Chapter/Topic</option>';
         // topicSelect.innerHTML = '<option value="">Select Topic</option>';
         // subtopicSelect.innerHTML = '<option value="">Select Subtopic</option>';
@@ -1414,8 +1438,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     chapterSelect.addEventListener('change', function () {
-        topicSelect.innerHTML = '<option value="">Select Topic</option>';
-        subtopicSelect.innerHTML = '<option value="">Select Subtopic</option>';
+        // Clear existing options first
+        topicSelect.innerHTML = '';
+        subtopicSelect.innerHTML = '';
+        //topicSelect.innerHTML = '<option value="">Select Topic</option>';
+        //subtopicSelect.innerHTML = '<option value="">Select Subtopic</option>';
         const cls = classSelect.value;
         const subject = subjectSelect.value;
         const chapter = getSelectedChapters();
@@ -1424,9 +1451,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (cls && subject && chapter) {
             // Split the comma-separated chapters string into an array
             const selectedChapters = chapter.split(',');
-
-            // Clear existing options first
-            topicSelect.innerHTML = '';
 
             // Use a Set to avoid duplicate topics across multiple chapters
             const uniqueTopics = new Set();
@@ -1454,11 +1478,14 @@ document.addEventListener('DOMContentLoaded', function () {
             uniqueTopics.forEach(topic => {
                 topicSelect.innerHTML += `<option value="${topic}">${topic}</option>`;
             });
+            console.log('Populated Topics:', Array.from(uniqueTopics));
         }
     });
 
     topicSelect.addEventListener('change', function () {
-        subtopicSelect.innerHTML = '<option value="">Select Subtopic</option>';
+        // Clear existing options first
+        subtopicSelect.innerHTML = '';
+        //subtopicSelect.innerHTML = '<option value="">Select Subtopic</option>';
         const cls = classSelect.value;
         const subject = subjectSelect.value;
         const chapter = getSelectedChapters();
@@ -1468,9 +1495,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // Split the comma-separated chapters and topics into arrays
             const selectedChapters = chapter.split(',');
             const selectedTopics = topic.split(',');
-
-            // Clear existing options first
-            subtopicSelect.innerHTML = '';
 
             // Use a Set to avoid duplicate subtopics across multiple chapters/topics
             const uniqueSubtopics = new Set();
@@ -1508,19 +1532,19 @@ document.addEventListener('DOMContentLoaded', function () {
     function getSelectedChapters() {
         const selectedOptions = Array.from(chapterSelect.selectedOptions);
         const values = selectedOptions.map(option => option.value);
-        console.debug('Selected chapters:', values);
+        debugLog('Selected chapters:', values);
         return values.join(',');
     }
     function getSelectedTopics() {
         const selectedOptions = Array.from(topicSelect.selectedOptions);
         const values = selectedOptions.map(option => option.value);
-        console.debug('getSelectedTopics:', values);
+        debugLog('getSelectedTopics:', values);
         return values.join(',');
     }
     function getSelectedSubtopics() {
         const selectedOptions = Array.from(subtopicSelect.selectedOptions);
         const values = selectedOptions.map(option => option.value);
-        console.debug('getSelectedSubtopics:', values);
+        debugLog('getSelectedSubtopics:', values);
         return values.join(',');
     }
 
@@ -1530,33 +1554,33 @@ document.addEventListener('DOMContentLoaded', function () {
         const params = new URLSearchParams(window.location.search);
         if (params.has('board') && boardSelect) {
             setDropdownValue(boardSelect, params.get('board'));
-            console.debug('Prepopulating board:', params.get('board'));
+            debugLog('Prepopulating board:', params.get('board'));
         }
         if (params.has('class') && classSelect) {
             setDropdownValue(classSelect, params.get('class'));
-            console.debug('Prepopulating class:', params.get('class'));
+            debugLog('Prepopulating class:', params.get('class'));
         }
         if (params.has('subject') && subjectSelect) {
             setDropdownValue(subjectSelect, params.get('subject'));
-            console.debug('Prepopulating subject:', params.get('subject'));
+            debugLog('Prepopulating subject:', params.get('subject'));
         }
         if (params.has('chapters')) {
             setDropdownValue(chapterSelect, params.get('chapters'), true);
-            console.debug('Prepopulating chapters:', params.get('chapters'));
+            debugLog('Prepopulating chapters:', params.get('chapters'));
         }
         if (params.has('topics')) {
             setDropdownValue(topicSelect, params.get('topics'), true);
-            console.debug('Prepopulating topics:', params.get('topics'));
+            debugLog('Prepopulating topics:', params.get('topics'));
         }
         if (params.has('subtopics')) {
             setDropdownValue(subtopicSelect, params.get('subtopics'), true);
-            console.debug('Prepopulating subtopics:', params.get('subtopics'));
+            debugLog('Prepopulating subtopics:', params.get('subtopics'));
         }
         updateSendBtnState();
     }
     // Call after dropdowns and checkboxes are populated
     //window.prepopulateFromURL = prepopulateFromURL;
-    prepopulateFromURL();
+    //prepopulateFromURL();
 
     // After populating dropdowns and checkboxes, call prepopulateFromURL()
     // For example, after populateClassDropdown, populateCheckboxes, etc.

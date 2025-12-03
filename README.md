@@ -47,6 +47,17 @@ This project is a web-based educational AI chatbot UI designed for safe, control
 5. Use the sentence builder panel to manage and send custom prompts.
 6. For debugging, use `?simulation=true` in the URL to simulate API responses instantly.
 
+## Debug Logging
+
+To enable debug logging, add `?debug=true` to the URL. This will show extra console logs for dropdown population, selection restoration, and API calls.
+
+Example:
+```
+http://127.0.0.1:5500/?board=CBSE&class=Class9&subject=Mathematics&chapters=Polynomials&topics=Definition&subtopics=Binomials&debug=true
+```
+
+If `debug=true` is not present, the UI will not log debug information to the console.
+
 ## Developer Documentation
 - **topics-hierarchy.json**: Defines the curriculum hierarchy. Update this file to add or modify classes, subjects, chapters, topics, or subtopics.
 - **main.js**: Handles UI logic, dropdown population, API calls, context menu, and sentence builder features.

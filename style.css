@@ -145,6 +145,7 @@ select:focus {
 
 .btn-full {
     width: 100%;
+    margin: 2px;
 }
 
 .btn:disabled, .btn[disabled], .btn.btn-primary:disabled {
