@@ -1005,294 +1005,78 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById('modal-pdf-btn').addEventListener('click', async function () {
-        console.debug('PDF export button clicked');
         const pdfError = document.getElementById('modal-pdf-error');
         pdfError.classList.add('hidden');
-        if (!currentDocument) {
-            console.debug('No current document selected for PDF export');
-            return;
-        }
-        if (!window.jspdf || !window.jspdf.jsPDF) {
-            console.debug('jsPDF library not loaded');
-            pdfError.textContent = 'jsPDF library not loaded.';
-            pdfError.classList.remove('hidden');
-            return;
-        }
+
+        if (!currentDocument) return;
+
         try {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            const doc = new jsPDF('p', 'pt', 'a4');
+            const A4_WIDTH = 595.28;
+            const A4_HEIGHT = 841.89;
 
-            const pageWidth = doc.internal.pageSize.width;
-            const margin = 15;
-            let y = margin;
+            // Build wrapper
+            const wrapper = document.createElement("div");
+            wrapper.style.width = "794px";  // match html2canvas DPI scaling
+            wrapper.style.padding = "20px";
+            wrapper.style.fontFamily = "Arial";
+            wrapper.style.lineHeight = "1.5";
 
-            // Function to create and render HTML content as image
-            async function renderMarkdownAsImage(markdownContent, containerWidth) {
-                return new Promise(async (resolve, reject) => {
-                    try {
-                        // Create temporary container for rendering
-                        const tempContainer = document.createElement('div');
-                        tempContainer.style.width = `${containerWidth - (margin * 2)}px`;
-                        tempContainer.style.padding = '20px';
-                        tempContainer.style.fontFamily = 'Arial, sans-serif';
-                        tempContainer.style.fontSize = '12px';
-                        tempContainer.style.lineHeight = '1.4';
-                        tempContainer.style.color = '#3a3a3a'; // Dark gray for ink optimization
-                        tempContainer.style.background = 'white';
-                        tempContainer.style.position = 'absolute';
-                        tempContainer.style.left = '-9999px'; // Move off-screen
-                        tempContainer.style.top = '0';
-
-                        // Convert markdown to HTML
-                        let htmlContent;
-                        if (window.marked) {
-                            htmlContent = window.marked.parse(markdownContent, {
-                                breaks: true,
-                                gfm: true
-                            });
-                        } else {
-                            // Fallback: basic HTML rendering
-                            htmlContent = markdownContent
-                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                                .replace(/`(.*?)`/g, '<code>$1</code>')
-                                .replace(/\n/g, '<br>');
-                        }
-
-                        tempContainer.innerHTML = htmlContent;
-
-                        // Apply styles for better rendering
-                        const styles = `
-                    <style>
-                        .markdown-content h1, .markdown-content h2, .markdown-content h3 {
-                            margin: 15px 0 10px 0;
-                            font-weight: bold;
-                            color: #2a2a2a;
-                        }
-                        .markdown-content h1 { font-size: 18px; }
-                        .markdown-content h2 { font-size: 16px; }
-                        .markdown-content h3 { font-size: 14px; }
-                        .markdown-content p {
-                            margin: 8px 0;
-                            line-height: 1.4;
-                        }
-                        .markdown-content code {
-                            background: #f5f5f5;
-                            padding: 2px 4px;
-                            border-radius: 3px;
-                            font-family: 'Courier New', monospace;
-                            font-size: 11px;
-                            color: #d63384;
-                        }
-                        .markdown-content pre {
-                            background: #f8f9fa;
-                            padding: 12px;
-                            border-radius: 5px;
-                            border-left: 4px solid #6c757d;
-                            overflow-x: auto;
-                            margin: 12px 0;
-                            font-family: 'Courier New', monospace;
-                            font-size: 11px;
-                            line-height: 1.3;
-                        }
-                        .markdown-content pre code {
-                            background: none;
-                            padding: 0;
-                            color: #2b2b2b;
-                        }
-                        .markdown-content blockquote {
-                            border-left: 4px solid #e9ecef;
-                            padding-left: 12px;
-                            margin: 12px 0;
-                            color: #6c757d;
-                            background: #f8f9fa;
-                            padding: 8px 12px;
-                        }
-                        .markdown-content ul, .markdown-content ol {
-                            margin: 8px 0;
-                            padding-left: 20px;
-                        }
-                        .markdown-content li {
-                            margin: 4px 0;
-                        }
-                        .markdown-content table {
-                            border-collapse: collapse;
-                            width: 100%;
-                            margin: 12px 0;
-                        }
-                        .markdown-content th, .markdown-content td {
-                            border: 1px solid #dee2e6;
-                            padding: 6px 8px;
-                            text-align: left;
-                        }
-                        .markdown-content th {
-                            background: #f8f9fa;
-                            font-weight: bold;
-                        }
-                        .markdown-content hr {
-                            border: none;
-                            border-top: 1px solid #e9ecef;
-                            margin: 20px 0;
-                        }
-                        .markdown-content a {
-                            color: #0066cc;
-                            text-decoration: none;
-                        }
-                    </style>
-                `;
-
-                        const styleElement = document.createElement('div');
-                        styleElement.innerHTML = styles;
-                        tempContainer.insertBefore(styleElement.firstElementChild, tempContainer.firstChild);
-
-                        // Add markdown-content class to container
-                        tempContainer.className = 'markdown-content';
-
-                        document.body.appendChild(tempContainer);
-
-                        // Use html2canvas to convert HTML to image
-                        const canvas = await html2canvas(tempContainer, {
-                            scale: 2, // Higher scale for better quality
-                            useCORS: true,
-                            allowTaint: true,
-                            backgroundColor: '#ffffff',
-                            logging: false,
-                            width: tempContainer.offsetWidth,
-                            height: tempContainer.scrollHeight,
-                            onclone: (clonedDoc, element) => {
-                                // Ensure styles are applied in the cloned document
-                                element.style.visibility = 'visible';
-                            }
-                        });
-
-                        // Clean up
-                        document.body.removeChild(tempContainer);
-
-                        resolve({
-                            imageData: canvas.toDataURL('image/jpeg', 0.8), // JPEG with compression for smaller size
-                            height: canvas.height / 2, // Divide by scale factor
-                            width: canvas.width / 2
-                        });
-
-                    } catch (error) {
-                        reject(error);
-                    }
-                });
-            }
-
-            // Process each document entry
+            // Load entries
             for (let i = 0; i < documents[currentDocument].length; i++) {
-                const entry = documents[currentDocument][i];
+                const block = document.createElement("div");
+                block.innerHTML = window.marked
+                    ? marked.parse(documents[currentDocument][i])
+                    : documents[currentDocument][i].replace(/\n/g, "<br>");
+                wrapper.appendChild(block);
 
-                // Check if we need a new page
-                if (y > doc.internal.pageSize.height - 50) {
-                    doc.addPage();
-                    y = margin;
-                }
-
-                try {
-                    // Render entry header
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(60, 60, 60);
-                    doc.text(`Entry ${i + 1}:`, margin, y);
-                    y += 10;
-
-                    // Render markdown content as image
-                    const contentWidth = pageWidth - (margin * 2);
-                    const renderedContent = await renderMarkdownAsImage(entry, contentWidth);
-
-                    // Calculate image dimensions to fit page width
-                    const imgWidth = contentWidth;
-                    const imgHeight = (renderedContent.height / renderedContent.width) * imgWidth;
-
-                    // Check if image fits on current page
-                    if (y + imgHeight > doc.internal.pageSize.height - margin) {
-                        // Split content across pages if needed
-                        let remainingHeight = imgHeight;
-                        let currentY = y;
-
-                        while (remainingHeight > 0) {
-                            const availableHeight = doc.internal.pageSize.height - currentY - margin;
-                            const chunkHeight = Math.min(remainingHeight, availableHeight);
-
-                            // Add image chunk
-                            doc.addImage(
-                                renderedContent.imageData,
-                                'JPEG',
-                                margin,
-                                currentY,
-                                imgWidth,
-                                chunkHeight,
-                                undefined,
-                                'FAST'
-                            );
-
-                            remainingHeight -= chunkHeight;
-                            currentY += chunkHeight;
-
-                            if (remainingHeight > 0) {
-                                doc.addPage();
-                                currentY = margin;
-                            }
-                        }
-
-                        y = currentY;
-                    } else {
-                        // Add image to current page
-                        doc.addImage(
-                            renderedContent.imageData,
-                            'JPEG',
-                            margin,
-                            y,
-                            imgWidth,
-                            imgHeight,
-                            undefined,
-                            'FAST'
-                        );
-                        y += imgHeight;
-                    }
-
-                    // Add spacing between entries
-                    if (i < documents[currentDocument].length - 1) {
-                        y += 15;
-
-                        // Add subtle separator
-                        if (y < doc.internal.pageSize.height - 10) {
-                            doc.setDrawColor(220);
-                            doc.line(margin, y, pageWidth - margin, y);
-                            y += 10;
-                        }
-                    }
-
-                } catch (renderError) {
-                    console.warn('Failed to render markdown as image, falling back to text:', renderError);
-
-                    // Fallback to text rendering
-                    doc.setFont(undefined, 'normal');
-                    doc.setTextColor(60, 60, 60);
-
-                    const cleanText = entry.replace(/<[^>]+>/g, '');
-                    const lines = doc.splitTextToSize(cleanText, pageWidth - (margin * 2));
-
-                    lines.forEach(line => {
-                        if (y > doc.internal.pageSize.height - 10) {
-                            doc.addPage();
-                            y = margin;
-                        }
-                        doc.text(line, margin, y);
-                        y += 6;
-                    });
-
-                    y += 8;
+                if (i < documents[currentDocument].length - 1) {
+                    const hr = document.createElement("hr");
+                    hr.style.margin = "25px 0";
+                    wrapper.appendChild(hr);
                 }
             }
 
-            doc.save(currentDocument + '.pdf');
-            console.debug('PDF generated and saved for document:', currentDocument);
+            // Prepare offscreen container
+            const temp = document.createElement("div");
+            temp.style.position = "absolute";
+            temp.style.left = "-9999px";
+            document.body.appendChild(temp);
+            temp.appendChild(wrapper);
+
+            // Render screenshot
+            const canvas = await html2canvas(wrapper, {
+                scale: 2,
+                logging: false
+            });
+
+            const imgData = canvas.toDataURL("image/png");
+
+            // Convert entire tall canvas → multiple PDF pages
+            let imgWidth = A4_WIDTH;
+            let imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+
+            heightLeft -= A4_HEIGHT;
+
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                doc.addPage();
+                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= A4_HEIGHT;
+            }
+
+            doc.save(`${currentDocument}.pdf`);
+
+            document.body.removeChild(temp);
 
         } catch (err) {
-            console.error('Error generating PDF:', err);
-            pdfError.textContent = 'Error generating PDF: ' + err.message;
+            pdfError.textContent = "PDF error: " + err.message;
             pdfError.classList.remove('hidden');
         }
     });
