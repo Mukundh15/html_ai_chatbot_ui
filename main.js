@@ -1137,6 +1137,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
         messageDiv.appendChild(headerDiv);
 
+        // For assistant messages, add navigation links (top ↔ bottom) and view toggle
+        let navTop = null;
+        let navBottom = null;
+
+        if (role === 'assistant') {
+            // Top navigation: link to end of response
+            navTop = document.createElement('a');
+            navTop.href = '#';
+            navTop.textContent = 'Go to end of response';
+            navTop.style.fontSize = '0.8rem';
+            navTop.style.marginBottom = '4px';
+            navTop.style.alignSelf = 'flex-end';
+
+            navTop.addEventListener('click', function (e) {
+                e.preventDefault();
+                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            });
+
+            messageDiv.appendChild(navTop);
+
+
+            lineBreak = document.createElement('br');
+            messageDiv.appendChild(lineBreak);
+        }
+
         // For assistant messages, add a small toggle to view rendered markdown or source
         if (role === 'assistant' && window.marked) {
             const toggleView = document.createElement('a');
@@ -1145,6 +1170,7 @@ document.addEventListener('DOMContentLoaded', function () {
             toggleView.style.fontSize = '0.8rem';
             toggleView.style.marginBottom = '4px';
             toggleView.style.alignSelf = 'flex-end';
+            toggleView.style.marginRight = '8px';
 
             toggleView.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -1293,6 +1319,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
                 messageDiv.appendChild(addBtn);
             }
+
+            // Bottom navigation: link to beginning of response
+            navBottom = document.createElement('a');
+            navBottom.href = '#';
+            navBottom.textContent = 'Go to beginning of response';
+            navBottom.style.display = 'block';
+            navBottom.style.fontSize = '0.8rem';
+            navBottom.style.marginTop = '6px';
+            navBottom.style.alignSelf = 'flex-end';
+
+            navBottom.addEventListener('click', function (e) {
+                e.preventDefault();
+                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            messageDiv.appendChild(navBottom);
         }
     }
 
