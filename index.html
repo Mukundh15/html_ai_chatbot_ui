@@ -110,8 +110,35 @@
             <div class="config-panel">
 
                 <div class="prompt-preview">
-                    <strong>Preview:</strong>
-                    <div id="system-preview">System: Act as a friendly tutor for a CBSE 10th Grade Mathematics student.
+                    <div class="prompt-preview-header">
+                        <strong>Preview:</strong>
+                        <a href="#" id="toggle-system-preview"
+                            style="margin-left: 8px; font-size: 0.9rem;">Show system configuration</a>
+                    </div>
+                    <div id="system-preview-section" class="hidden">
+                        <div id="system-preview">
+                            System: Act as a friendly tutor for a CBSE 10th Grade Mathematics student.
+                        </div>
+                        <div class="form-group">
+                            <label for="system-prompt">System Role</label>
+                            <select id="system-prompt">
+                                <option value="tutor">Friendly Tutor</option>
+                                <option value="teacher">Strict Teacher</option>
+                                <option value="explainer">Concept Explainer</option>
+                                <option value="simplifier">Content Simplifier</option>
+                                <option value="examiner">Exam Specialist</option>
+                                <option value="career-guide">Career Guide</option>
+                                <option value="storyteller">Storyteller</option>
+                                <option value="scientist">Scientist</option>
+                                <option value="problem-solver">Problem Solver</option>
+                                <option value="motivator">Motivational Coach</option>
+                                <option value="visual-teacher">Visual Teacher</option>
+                                <option value="critical-thinker">Critical Thinking Guide</option>
+                                <option value="practical-guide">Practical Guide</option>
+                                <option value="quick-learner">Quick Learning Coach</option>
+                                <option value="doubt-solver">Doubt Solver</option>
+                            </select>
+                        </div>
                     </div>
                     <div id="user-preview">User: Generate 5 practice problems on 'Algebra' with solutions.</div>
                 </div>
@@ -171,27 +198,6 @@
                         <option value="low">Low</option>
                         <option value="medium" selected>Medium</option>
                         <option value="high">High</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="system-prompt">System Role</label>
-                    <select id="system-prompt">
-                        <option value="tutor">Friendly Tutor</option>
-                        <option value="teacher">Strict Teacher</option>
-                        <option value="explainer">Concept Explainer</option>
-                        <option value="simplifier">Content Simplifier</option>
-                        <option value="examiner">Exam Specialist</option>
-                        <option value="career-guide">Career Guide</option>
-                        <option value="storyteller">Storyteller</option>
-                        <option value="scientist">Scientist</option>
-                        <option value="problem-solver">Problem Solver</option>
-                        <option value="motivator">Motivational Coach</option>
-                        <option value="visual-teacher">Visual Teacher</option>
-                        <option value="critical-thinker">Critical Thinking Guide</option>
-                        <option value="practical-guide">Practical Guide</option>
-                        <option value="quick-learner">Quick Learning Coach</option>
-                        <option value="doubt-solver">Doubt Solver</option>
                     </select>
                 </div>
 

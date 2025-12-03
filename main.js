@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const loading = document.getElementById('loading');
     const systemPreview = document.getElementById('system-preview');
     const userPreview = document.getElementById('user-preview');
-
+    const toggleSystemPreviewLink = document.getElementById('toggle-system-preview');
+    const systemPreviewSection = document.getElementById('system-preview-section');
 
 
     // User prompt templates
@@ -245,6 +246,17 @@ document.addEventListener('DOMContentLoaded', function () {
     debugLog('loading:', loading);
     debugLog('systemPreview:', systemPreview);
     debugLog('userPreview:', userPreview);
+
+    // System preview collapse/expand
+    if (toggleSystemPreviewLink && systemPreviewSection) {
+        toggleSystemPreviewLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            const isHidden = systemPreviewSection.classList.toggle('hidden');
+            toggleSystemPreviewLink.textContent = isHidden
+                ? 'Show system configuration'
+                : 'Hide system configuration';
+        });
+    }
 
     // Event Listeners (with null checks)
     [systemPromptSelect, boardSelect, classSelect, subjectSelect, topicTypeSelect, chapterSelect].forEach((select, idx) => {
