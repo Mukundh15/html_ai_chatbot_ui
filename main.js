@@ -367,14 +367,23 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace('{class}', cls)
             .replace('{subject}', subject);
 
+        // Build the topic phrase dynamically
+        let topicPhrase = '';
+        if (topic && topic.trim() !== '') {
+            if (subtopic && subtopic.trim() !== '') {
+                topicPhrase = `on '${topic}' - specifically '${subtopic}' from chapter '${chapter}' `;
+            } else {
+                topicPhrase = `on '${topic}' from chapter '${chapter}' `;
+            }
+        } else {
+            topicPhrase = `from chapter '${chapter}' `;
+        }
+
         const userContent = userTemplates[topicType]
-            .replace(/{chapter}/g, chapter)
             .replace(/{board}/g, board)
             .replace(/{class}/g, cls)
-            .replace(/{topic}/g, topic)
-            .replace(/{subtopic}/g, subtopic)
-            .replace(/{subject}/g, subject);
-
+            .replace(/{subject}/g, subject)
+            .replace(/{topicPhrase}/g, topicPhrase);
         // Display user message in chat
         addMessage('user', userContent);
         // Show loading
