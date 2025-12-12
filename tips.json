@@ -1,0 +1,74 @@
+{
+  "tips": [
+    {
+      "tip_number": 1,
+      "title": "Be Specific About the Subject and Topic",
+      "description": "Mention the exact subject (Physics, Chemistry, History, etc.), chapter name, and specific concept you need help with.",
+      "example": "Instead of: 'Explain electricity.'\nUse: 'Explain Ohm's Law from Class 10 Physics, Chapter 12 - Electricity.'",
+      "purpose": "Helps the AI focus exactly on your syllabus and level."
+    },
+    {
+      "tip_number": 2,
+      "title": "State Your Learning Goal",
+      "description": "Clearly say what you want to achieve - understand a concept, get examples, solve problems, or revise.",
+      "example": "'I am struggling to understand the process of photosynthesis in plants from Class 11 Biology. Can you explain it step-by-step with a simple diagram description?'",
+      "purpose": "Guides the AI to structure the response for your need."
+    },
+    {
+      "tip_number": 3,
+      "title": "Ask for Real-Life Examples or Applications",
+      "description": "Request examples linked to daily life to make textbook concepts relatable and memorable.",
+      "example": "'Give me three real-life applications of the concept of 'Pressure' from Class 9 Physics. How is it used in tools like knives or syringes?'",
+      "purpose": "Enhances understanding and aids in answering application-based questions."
+    },
+    {
+      "tip_number": 4,
+      "title": "Request Breakdown of Complex Processes",
+      "description": "For processes (e.g., nitrogen cycle, chemical reactions), ask for a step-by-step breakdown.",
+      "example": "'Break down the steps of the 'Nitrogen Cycle' from Class 12 Biology into a numbered list with a one-line explanation for each step.'",
+      "purpose": "Makes complex information easier to digest and memorize."
+    },
+    {
+      "tip_number": 5,
+      "title": "Ask for Comparisons and Differences",
+      "description": "Prompt the AI to compare two similar or often confused concepts to clarify distinctions.",
+      "example": "'Compare and contrast 'Distance and Displacement' from Class 9 Physics in a table format with two points each.'",
+      "purpose": "Useful for mastering definitions and avoiding common mistakes."
+    },
+    {
+      "tip_number": 6,
+      "title": "Prompt for Mnemonics or Memory Aids",
+      "description": "Ask the AI to create a catchy mnemonic, acronym, or trick to remember lists, sequences, or formulas.",
+      "example": "'Create a funny mnemonic to remember the order of reactivity series for metals (K, Na, Ca, Mg, Al, Zn, Fe, Pb, H, Cu, Hg, Ag, Au, Pt) from Class 10 Chemistry.'",
+      "purpose": "Great for exam preparation and recalling lengthy information."
+    },
+    {
+      "tip_number": 7,
+      "title": "Ask for Problem-Solving Steps",
+      "description": "When stuck on numerical or derivation problems, ask the AI to explain the solution step-by-step.",
+      "example": "'Solve this numerical from Class 12 Physics, Chapter 2 - Electrostatic Potential: 'Calculate the potential at a point due to a charge of 4x10^-7 C located 9 cm away.' Show all formulas and steps.'",
+      "purpose": "Helps you learn the method, not just the final answer."
+    },
+    {
+      "tip_number": 8,
+      "title": "Request a 'Explain Like I'm 15' Summary",
+      "description": "Ask for a simplified summary of a dense paragraph or concept from your textbook.",
+      "example": "'Explain the 'Central Limit Theorem' from Class 12 Maths (Statistics) like I'm 15. Use a simple analogy.'",
+      "purpose": "Cuts through jargon and builds foundational understanding."
+    },
+    {
+      "tip_number": 9,
+      "title": "Ask for Potential Exam Questions",
+      "description": "Prompt the AI to generate important questions or identify key topics from a chapter.",
+      "example": "'Based on the CBSE pattern, list 5 most important 3-mark questions likely from Class 10 History Chapter 1 - The Rise of Nationalism in Europe.'",
+      "purpose": "Aids in focused revision and exam readiness."
+    },
+    {
+      "tip_number": 10,
+      "title": "Combine Tasks for Deeper Learning",
+      "description": "Combine multiple requests in one prompt for a comprehensive study session.",
+      "example": "'For the chapter 'Acids, Bases and Salts' (Class 10 Chemistry):\n1. Give me a one-paragraph summary.\n2. List 3 key properties of acids with examples.\n3. Write the chemical formula for three common salts.\n4. Suggest a simple experiment to show neutralization.'",
+      "purpose": "Creates a complete learning module in one interaction."
+    }
+  ]
+}
